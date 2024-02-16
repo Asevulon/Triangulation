@@ -234,21 +234,6 @@ double mTriangulation::GetCircleRadius()
 double mTriangulation::Estimate()
 {
 	double res = 0;
-	/*vector<double> temp;
-	temp.resize(triangles.size());
-	for (int i = 0; i < triangles.size(); i++)
-	{
-		mpoint oc = CalcCircleCenter(triangles[i].p1, triangles[i].p2, triangles[i].p3);
-		mpoint ic = CalcICircleCenter(triangles[i].p1, triangles[i].p2, triangles[i].p3);
-		temp[i] = pow2(oc.first - ic.first) + pow2(oc.second - ic.second);
-	}
-	double tm = *max_element(temp.begin(), temp.end());
-	for (int i = 0; i < triangles.size(); i++)
-	{
-		res += temp[i] / tm;
-	}
-	res /= min(dots, M * N);*/
-
 	for (auto& item : triangles)
 	{
 		mpoint oc = CalcCircleCenter(item.p1, item.p2, item.p3);
