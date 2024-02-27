@@ -29,6 +29,7 @@ public:
 	bool occ = true;
 	bool trc = true;
 	bool rgc = true;
+	bool rtc = true;
 
 	afx_msg void OnBnClickedOk();
 	CButton ICCheck;
@@ -41,4 +42,5 @@ public:
 	double rb;
 	double tb;
 	double bb;
+	CButton RTCheck;
 };

@@ -44,6 +44,7 @@ void StartSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT6, rb);
 	DDX_Text(pDX, IDC_EDIT7, tb);
 	DDX_Text(pDX, IDC_EDIT8, bb);
+	DDX_Control(pDX, IDC_CHECK5, RTCheck);
 }
 
 
@@ -66,6 +67,8 @@ void StartSettingsDlg::OnBnClickedOk()
 	else trc = false;
 	if (RGCheck.GetCheck() == BST_CHECKED)rgc = true;
 	else rgc = false;
+	if (RTCheck.GetCheck() == BST_CHECKED)rtc = true;
+	else rtc = false;
 	UpdateData();
 	CDialogEx::OnOK();
 }
@@ -85,6 +88,8 @@ BOOL StartSettingsDlg::OnInitDialog()
 	else TrCheck.SetCheck(BST_UNCHECKED);
 	if (rgc)RGCheck.SetCheck(BST_CHECKED);
 	else RGCheck.SetCheck(BST_UNCHECKED);
+	if (rtc)RTCheck.SetCheck(BST_CHECKED);
+	else RTCheck.SetCheck(BST_UNCHECKED);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// Исключение: страница свойств OCX должна возвращать значение FALSE

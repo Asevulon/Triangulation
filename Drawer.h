@@ -2,11 +2,9 @@
 
 
 // Drawer
-#include<gdiplus.h>
 #include<vector>
 #include<algorithm>
 using namespace std;
-using namespace Gdiplus;
 
 #include"mTriangulation.h"
 
@@ -16,6 +14,7 @@ class Drawer : public CStatic
 private:
 	vector<mpoint>data;
 	vector<Triangle>triangles;
+	vector<mPoint>data;
 
 	double lPadding;
 	double rPadding;

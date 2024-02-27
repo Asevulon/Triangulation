@@ -19,6 +19,7 @@
 #define IDC_EDIT6                       1010
 #define IDC_EDIT7                       1011
 #define IDC_EDIT8                       1012
+#define IDC_CHECK5                      1013
 #define ID_32771                        32771
 #define ID_START_SETTINGS               32772
 
