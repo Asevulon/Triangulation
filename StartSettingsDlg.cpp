@@ -13,14 +13,13 @@ IMPLEMENT_DYNAMIC(StartSettingsDlg, CDialogEx)
 
 StartSettingsDlg::StartSettingsDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_START_SETTINGS_DIALOG, pParent)
-	, N(2)
-	, M(2)
-	, dots(3)
-	, noiseval(0.01)
+	, RectGridConc(10)
+	, dots(10)
 	, lb(0)
-	, rb(10)
-	, tb(10)
+	, rb(1)
+	, tb(1)
 	, bb(0)
+	, cdots(20)
 {
 
 }
@@ -32,19 +31,26 @@ StartSettingsDlg::~StartSettingsDlg()
 void StartSettingsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_EDIT1, N);
-	DDX_Text(pDX, IDC_EDIT2, M);
+	DDX_Text(pDX, IDC_EDIT1, RectGridConc);
 	DDX_Text(pDX, IDC_EDIT3, dots);
 	DDX_Control(pDX, IDC_INSIDE_CIRCLE_CHECK, ICCheck);
 	DDX_Control(pDX, IDC_OUT_CIRCLE_CHECK, OCCheck);
 	DDX_Control(pDX, IDC_TRIANGULATION_CHECK, TrCheck);
-	DDX_Text(pDX, IDC_EDIT4, noiseval);
 	DDX_Control(pDX, IDC_CHECK4, RGCheck);
 	DDX_Text(pDX, IDC_EDIT5, lb);
 	DDX_Text(pDX, IDC_EDIT6, rb);
 	DDX_Text(pDX, IDC_EDIT7, tb);
 	DDX_Text(pDX, IDC_EDIT8, bb);
 	DDX_Control(pDX, IDC_CHECK5, RTCheck);
+	DDX_Control(pDX, IDC_SLIDER1, trx1);
+	DDX_Control(pDX, IDC_SLIDER2, try1);
+	DDX_Control(pDX, IDC_SLIDER3, r1);
+	DDX_Control(pDX, IDC_SLIDER4, s1);
+	DDX_Control(pDX, IDC_SLIDER5, trx2);
+	DDX_Control(pDX, IDC_SLIDER6, try2);
+	DDX_Control(pDX, IDC_SLIDER7, r2);
+	DDX_Control(pDX, IDC_SLIDER8, s2);
+	DDX_Text(pDX, IDC_EDIT4, cdots);
 }
 
 
@@ -70,6 +76,16 @@ void StartSettingsDlg::OnBnClickedOk()
 	if (RTCheck.GetCheck() == BST_CHECKED)rtc = true;
 	else rtc = false;
 	UpdateData();
+
+	vtx1 = trx1.GetPos();
+	vtx2 = trx2.GetPos();
+	vty1 = try1.GetPos();
+	vty2 = try2.GetPos();
+
+	vr1 = r1.GetPos();
+	vr2 = r2.GetPos();
+	vs1 = s1.GetPos();
+	vs2 = s2.GetPos();
 	CDialogEx::OnOK();
 }
 
@@ -91,6 +107,37 @@ BOOL StartSettingsDlg::OnInitDialog()
 	if (rtc)RTCheck.SetCheck(BST_CHECKED);
 	else RTCheck.SetCheck(BST_UNCHECKED);
 
+
+	trx1.SetRange(0, 100);
+	trx2.SetRange(0, 100);
+	try1.SetRange(0, 100);
+	try2.SetRange(0, 100);
+	
+	r1.SetRange(0, 120);
+	r2.SetRange(0, 120);
+
+	s1.SetRange(1, 100);
+	s2.SetRange(1, 100);
+
+	trx1.SetTic(1);
+	trx2.SetTic(1);
+	try1.SetTic(1);
+	try2.SetTic(1);
+
+	r1.SetTic(1);
+	r2.SetTic(1);
+	s1.SetTic(1);
+	s2.SetTic(1);
+
+	trx1.SetPos(vtx1);
+	trx2.SetPos(vtx2);
+	try1.SetPos(vty1);
+	try2.SetPos(vty2);
+
+	r1.SetPos(vr1);
+	r2.SetPos(vr2);
+	s1.SetPos(vs1);
+	s2.SetPos(vs2);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// Исключение: страница свойств OCX должна возвращать значение FALSE
 }

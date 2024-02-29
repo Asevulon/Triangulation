@@ -29,6 +29,8 @@ void MyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MAIN_PICTURE, m_mpic);
 	DDX_Control(pDX, IDOK, OkBtn);
 	DDX_Control(pDX, IDC_EDIT1, EstCtrl);
+	DDX_Control(pDX, IDC_BUTTON1, prevbtm);
+	DDX_Control(pDX, IDC_BUTTON2, nextbtn);
 }
 
 BEGIN_MESSAGE_MAP(MyDlg, CDialogEx)
@@ -36,6 +38,10 @@ BEGIN_MESSAGE_MAP(MyDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_COMMAND(ID_START_SETTINGS, &MyDlg::OnStartSettings)
 	ON_BN_CLICKED(IDOK, &MyDlg::OnBnClickedOk)
+	ON_WM_TIMER()
+	ON_WM_KEYDOWN()
+	ON_BN_CLICKED(IDC_BUTTON1, &MyDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &MyDlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -51,12 +57,17 @@ BOOL MyDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Мелкий значок
 
 	// TODO: добавьте дополнительную инициализацию
-	m_mpic.SetPadding(50, 50, 50, 50);
+	m_mpic.SetPadding(5, 5, 5, 5);
 	
-	SetWindowPos(NULL, 500, 100, 700, 770, SWP_NOMOVE);
+	SetWindowPos(NULL, 500, 100, 700, 800, SWP_NOMOVE);
 	m_mpic.SetWindowPos(NULL, 7, 7, 670, 670, NULL);
 	EstCtrl.SetWindowPos(NULL, 99, 683, 580, 20, NULL);
 	OkBtn.SetWindowPos(NULL, 7, 683, 0, 0, SWP_NOSIZE);
+	prevbtm.SetWindowPos(NULL, 7, 713, 0, 0, SWP_NOSIZE);
+	nextbtn.SetWindowPos(NULL, 99, 713, 0, 0, SWP_NOSIZE);
+
+	InProcEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+	SetEvent(InProcEvent);
 	return TRUE;  // возврат значения TRUE, если фокус не передан элементу управления
 }
 
@@ -103,33 +114,94 @@ void MyDlg::OnStartSettings()
 	// TODO: добавьте свой код обработчика команд
 	if (dlg.DoModal() != IDOK)return;
 	
-	tr.SetNM(dlg.N, dlg.M);
-	tr.SetDots(dlg.dots);
-	tr.SetNoise(dlg.noiseval);
-	tr.SetRectGridState(dlg.rgc);
-	tr.SetBoders(dlg.lb, dlg.rb, dlg.tb, dlg.bb);
+	tr.SetCircleDots(dlg.cdots);
+	tr.SetRectGridConc(dlg.RectGridConc);
+	tr.SetBorders(dlg.lb, dlg.rb, dlg.tb, dlg.bb);
+	tr.SetTriangleDots(dlg.dots);
+	tr.SetTrianglesParams(mPoint(dlg.vtx1, dlg.vty1), mPoint(dlg.vtx2, dlg.vty2), dlg.vr1, dlg.vr2, dlg.vs1, dlg.vs2);
 	m_mpic.SetCircleDrawing(dlg.occ, dlg.icc);
 	m_mpic.Invalidate();
 }
 
-
 void MyDlg::OnBnClickedOk()
 {
 	// TODO: добавьте свой код обработчика уведомлений
-	tr.CreateRandomDots();
-	tr.CreateCirle();
+	tr.stop = true;
+	EnterCriticalSection(&tr.cs);
+	TerminateThread(thread, 0);
+	LeaveCriticalSection(&tr.cs);
+	timerid = SetTimer(123, 100, NULL);
+	
+	CloseHandle(thread);
+
+	thread = CreateThread(NULL, NULL, ThreadFunc, this, NULL, NULL);
+}
+
+
+void MyDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: добавьте свой код обработчика сообщений или вызов стандартного
 	m_mpic.SetData(tr.GetPoints());
-	m_mpic.SetOCircleParams(tr.GetCircleCenter(), tr.GetCircleRadius());
-	m_mpic.SetICircleParams(tr.GetICircleCenter(), tr.GetICircleRadius());
+	m_mpic.SetTriangles(tr.GetTriangles());
+	m_mpic.Invalidate();
+	CDialogEx::OnTimer(nIDEvent);
+}
 
-	if (dlg.trc)
+
+void MyDlg::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: добавьте свой код обработчика сообщений или вызов стандартного
+	switch (nChar)
 	{
-		tr.Triangulation();
-		m_mpic.SetTriangles(tr.GetTriangles());
-
-		CString str;
-		str.Format(L"Средняя близость к равностороннему треугольнику: %.2f", tr.GetEsimate());
-		EstCtrl.SetWindowTextW(str);
+	case VK_LEFT:m_mpic.PrevTriangle();
+		break;
+	case VK_RIGHT:m_mpic.NextTriangle();
+		break;
+	default:
+		break;
 	}
 	m_mpic.Invalidate();
+	CDialogEx::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+void MyDlg::OnBnClickedButton1()
+{
+	// TODO: добавьте свой код обработчика уведомлений
+	m_mpic.PrevTriangle();
+}
+
+
+void MyDlg::OnBnClickedButton2()
+{
+	// TODO: добавьте свой код обработчика уведомлений
+	m_mpic.NextTriangle();
+}
+
+DWORD __stdcall ThreadFunc(LPVOID p)
+{
+	MyDlg* dlg = (MyDlg*)p;
+
+
+	dlg->tr.MakeStartGrid();
+	dlg->m_mpic.SetOCircleParams(dlg->tr.GetOCircleCenter(), dlg->tr.GetOCircleRadius());
+	dlg->m_mpic.SetICircleParams(dlg->tr.GetICircleCenter(), dlg->tr.GetICircleRadius());
+	if (dlg->dlg.trc)
+	{
+		if (dlg->dlg.rtc)dlg->tr.rTriangulate();
+		else dlg->tr.Triangulate();
+
+		if (dlg->dlg.rgc)dlg->tr.RemoveOS();
+
+		CString str;
+		str.Format(L"Средняя близость к равностороннему треугольнику: %.2f", dlg->tr.Estimate());
+		dlg->EstCtrl.SetWindowTextW(str);
+	}
+
+	dlg->m_mpic.SetData(dlg->tr.GetPoints());
+	dlg->m_mpic.SetTriangles(dlg->tr.GetTriangles());
+	dlg->m_mpic.Invalidate();
+	dlg->KillTimer(dlg->timerid);
+
+	return 0;
 }

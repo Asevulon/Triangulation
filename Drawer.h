@@ -12,9 +12,8 @@ class Drawer : public CStatic
 {
 	DECLARE_DYNAMIC(Drawer)
 private:
-	vector<mpoint>data;
-	vector<Triangle>triangles;
 	vector<mPoint>data;
+	vector<rTriangle>triangles;
 
 	double lPadding;
 	double rPadding;
@@ -27,7 +26,7 @@ private:
 	double bot;
 	double top;
 
-	int pointsize = 5;
+	int pointsize = 4;
 	ULONG_PTR token;
 	
 	CString title;
@@ -36,11 +35,11 @@ private:
 	bool NeedICircle = false;
 
 	bool OCircleInit = false;
-	mpoint OCircleCenter;
+	mPoint OCircleCenter;
 	double OCircleRadius;
 
 	bool ICircleInit = false;
-	mpoint ICircleCenter;
+	mPoint ICircleCenter;
 	double ICircleRadius;
 
 	double EternalScale = 1;
@@ -57,30 +56,37 @@ private:
 
 	int width = 0;
 	int height = 0;
+
+	int CurrentTriangle = 0;
 public:
 	Drawer();
 	virtual ~Drawer();
 
 protected:
 	double CalcStringLen(HDC hDC, CString string);
+	Color DetermineTriangleColor(double& tr);
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
-	void SetData(vector<mpoint>& points);
+	void SetData(vector<mPoint>& points);
 	//Отступ задается в процентах (диапазон значений от 0 до 100)
 	void SetPadding(double lPadding, double rPadding, double tPadding, double bPadding);
 	void SetMarksLen(int len);
 	void SetTitle(CString str);
 
-	void SetTriangles(vector<Triangle>& in);
+	void SetTriangles(vector<rTriangle>& in);
 	void SetCircleDrawing(bool OCState, bool ICState);
-	void SetOCircleParams(mpoint center, double radius);
-	void SetICircleParams(mpoint center, double radius);
+	void SetOCircleParams(mPoint center, double radius);
+	void SetICircleParams(mPoint center, double radius);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+
+	void NextTriangle();
+	void PrevTriangle();
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 

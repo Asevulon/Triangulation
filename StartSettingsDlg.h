@@ -22,11 +22,10 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	int N;
-	int M;
+	int RectGridConc;
 	int dots;
-	bool icc = true;
-	bool occ = true;
+	bool icc = false;
+	bool occ = false;
 	bool trc = true;
 	bool rgc = true;
 	bool rtc = true;
@@ -36,11 +35,28 @@ public:
 	CButton OCCheck;
 	virtual BOOL OnInitDialog();
 	CButton TrCheck;
-	double noiseval;
 	CButton RGCheck;
 	double lb;
 	double rb;
 	double tb;
 	double bb;
 	CButton RTCheck;
+	CSliderCtrl trx1;
+	CSliderCtrl try1;
+	CSliderCtrl r1;
+	CSliderCtrl s1;
+	CSliderCtrl trx2;
+	CSliderCtrl try2;
+	CSliderCtrl r2;
+	CSliderCtrl s2;
+
+	double vtx1 = 21;
+	double vty1 = 21;
+	double vtx2 = 50;
+	double vty2 = 50;
+	double vr1 = 0;
+	double vr2 = 0;
+	double vs1 = 27;
+	double vs2 = 27;
+	int cdots;
 };

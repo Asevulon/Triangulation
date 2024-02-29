@@ -20,16 +20,27 @@
 #define IDC_EDIT7                       1011
 #define IDC_EDIT8                       1012
 #define IDC_CHECK5                      1013
+#define IDC_SLIDER1                     1014
+#define IDC_SLIDER2                     1015
+#define IDC_BUTTON1                     1015
+#define IDC_SLIDER3                     1016
+#define IDC_BUTTON2                     1016
+#define IDC_SLIDER4                     1017
+#define IDC_SLIDER5                     1018
+#define IDC_SLIDER6                     1019
+#define IDC_SLIDER7                     1020
+#define IDC_SLIDER8                     1021
 #define ID_32771                        32771
 #define ID_START_SETTINGS               32772
+#define ID_RECURSIVE_TRIANGULATION      32773
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         1009
+#define _APS_NEXT_COMMAND_VALUE         32774
+#define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

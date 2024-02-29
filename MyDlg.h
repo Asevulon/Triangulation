@@ -34,11 +34,25 @@ public:
 	Drawer m_mpic;
 	afx_msg void OnStartSettings();
 
-	mTriangulation tr;
+	RecursiveTriangulation tr;
 	afx_msg void OnBnClickedOk();
 	CButton OkBtn;
 
 	StartSettingsDlg dlg;
 
 	CEdit EstCtrl;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton2();
+	CButton prevbtm;
+	CButton nextbtn;
+
+
+	HANDLE thread;
+	UINT_PTR timerid;
+	HANDLE InProcEvent;
 };
+
+
+DWORD WINAPI ThreadFunc(LPVOID p);
