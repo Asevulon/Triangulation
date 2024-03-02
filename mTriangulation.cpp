@@ -324,6 +324,9 @@ void RecursiveTriangulation::TrianglesOS()
 	p3 += v;
 
 	rTriangle OsTriangle(p1, p2, p3);
+	OsTriangle.p1.InBaseTriangle = true;
+	OsTriangle.p2.InBaseTriangle = true;
+	OsTriangle.p3.InBaseTriangle = true;
 	CalcTrianglesNodes(OsTriangle);
 
 	tc = CalcCircleCenter(Triangle2.p1, Triangle2.p2, Triangle2.p3);
@@ -345,6 +348,9 @@ void RecursiveTriangulation::TrianglesOS()
 	p3 += v;
 
 	OsTriangle = rTriangle(p1, p2, p3);
+	OsTriangle.p1.InBaseTriangle = true;
+	OsTriangle.p2.InBaseTriangle = true;
+	OsTriangle.p3.InBaseTriangle = true;
 	CalcTrianglesNodes(OsTriangle);
 }
 
@@ -468,6 +474,7 @@ int RecursiveTriangulation::MarkBrockenTriangles(mPoint& p)
 	int brocken = 0;
 	for (int i = 0; i < triangles.size(); i++)
 	{
+		if (triangles[i].Protected)continue;
 		if (triangles[i].InCircleRange(p))
 		{
 			triangles[i].broken = true;
@@ -490,6 +497,20 @@ vector<mPoint> RecursiveTriangulation::CollectBrockenNodes()
 		}
 	}
 	return res;
+}
+
+int RecursiveTriangulation::ProtectTriangles()
+{
+	int count = 0;
+	for (auto& item : triangles)
+	{
+		if (item.p1.InBaseTriangle || item.p2.InBaseTriangle || item.p3.InBaseTriangle)
+		{
+			item.Protected = true;
+			count++;
+		}
+	}
+	return count;
 }
 
 void RecursiveTriangulation::Triangulate(vector<mPoint>& points)
@@ -870,7 +891,7 @@ bool RecursiveTriangulation::rTriangulate()
 	if (!GetRectGrid(rgrid))return false;
 
 	Triangulate();
-
+	ProtectTriangles();
 	for (auto& p : rgrid)
 	{
 		MarkBrockenTriangles(p);
@@ -1052,6 +1073,7 @@ void RecursiveTriangulation::CalcTrianglesNodes(rTriangle& target)
 	v31 /= TriangleDots;
 
 	mPoint p = target.p1;
+
 	EnterCriticalSection(&cs);
 	nodes.push_back(p);
 	LeaveCriticalSection(&cs);
@@ -1066,6 +1088,7 @@ void RecursiveTriangulation::CalcTrianglesNodes(rTriangle& target)
 	}
 
 	p = target.p2;
+
 	EnterCriticalSection(&cs);
 	nodes.push_back(p);
 	LeaveCriticalSection(&cs);
@@ -1080,6 +1103,7 @@ void RecursiveTriangulation::CalcTrianglesNodes(rTriangle& target)
 	}
 
 	p = target.p3;
+	
 	EnterCriticalSection(&cs);
 	nodes.push_back(p);
 	LeaveCriticalSection(&cs);
