@@ -42,6 +42,7 @@ struct mPoint
 	double x = 0;
 	double y = 0;
 	bool IsOS = false;
+	bool InBaseTriangle = false;
 	mPointType type = mPointType::none;
 	mPoint();
 	mPoint(double x, double  y, mPointType t = mPointType::none, bool bOS = false);
@@ -61,6 +62,7 @@ struct rTriangle
 	double est = 0;
 	bool bOS = false;
 	bool broken = false;
+	bool Protected = false;
 	rTriangle();
 	rTriangle(mPoint& p1, mPoint& p2, mPoint& p3);
 	void FillVector2d(Vector2d& v12, Vector2d& v23, Vector2d& v31);
@@ -162,6 +164,7 @@ protected:
 
 	void Triangulate(vector<mPoint>& points);
 
+	int ProtectTriangles();
 public:
 	RecursiveTriangulation();
 	bool SetBorders(double l, double r, double t, double b);
