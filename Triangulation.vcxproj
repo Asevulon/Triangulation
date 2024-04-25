@@ -185,6 +185,8 @@
   <ItemGroup>
     <ClInclude Include="Drawer.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="galerkin.h" />
+    <ClInclude Include="Global.h" />
     <ClInclude Include="mTriangulation.h" />
     <ClInclude Include="MyDlg.h" />
     <ClInclude Include="pch.h" />
@@ -195,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drawer.cpp" />
+    <ClCompile Include="galerkin.cpp" />
     <ClCompile Include="mTriangulation.cpp" />
     <ClCompile Include="MyDlg.cpp" />
     <ClCompile Include="pch.cpp">

@@ -5,77 +5,9 @@
 using namespace Gdiplus;
 
 using namespace std;
+#include"Global.h"
 
 
-
-struct mPoint;
-
-struct Vector2d
-{
-	double x = 0;
-	double y = 0;
-	Vector2d();
-	Vector2d(double x, double y);
-	Vector2d(mPoint& p1, mPoint& p2);
-	Vector2d operator +(Vector2d& r);
-	Vector2d operator -(Vector2d & r);
-	Vector2d& operator /=(double& r);
-	Vector2d& operator /=(int& r);
-	Vector2d operator *(double& r);
-	Vector2d operator *(int& r);
-	Vector2d& operator *=(double r);
-	double abs();
-	double GetK();
-	Vector2d& normalize(double newabs = 1);
-
-};
-
-enum mPointType
-{
-	none,
-	gridp,
-	circlep,
-	trianglep
-};
-struct mPoint
-{
-	double x = 0;
-	double y = 0;
-	bool IsOS = false;
-	bool InBaseTriangle = false;
-	mPointType type = mPointType::none;
-	mPoint();
-	mPoint(double x, double  y, mPointType t = mPointType::none, bool bOS = false);
-	mPoint operator + (mPoint& right);
-	mPoint operator / (double& r);
-	mPoint& operator +=(Vector2d& r);
-	mPoint& operator /=(double& r);
-	bool operator == (mPoint& r);
-};
-
-struct rTriangle
-{
-	mPoint p1, p2, p3;
-	mPoint CircleCenter;
-	double CircleRadius = 0;
-	double ICircleRadius = 0;
-	double est = 0;
-	bool bOS = false;
-	bool broken = false;
-	bool Protected = false;
-	rTriangle();
-	rTriangle(mPoint& p1, mPoint& p2, mPoint& p3);
-	void FillVector2d(Vector2d& v12, Vector2d& v23, Vector2d& v31);
-	mPointType& type1();
-	mPointType& type2();
-	mPointType& type3();
-
-	bool InCircleRange(mPoint& p);
-	bool Contains(mPoint& p);
-};
-
-
-double rand(double left, double right);
 
 
 

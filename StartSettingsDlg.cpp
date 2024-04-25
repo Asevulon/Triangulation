@@ -20,6 +20,9 @@ StartSettingsDlg::StartSettingsDlg(CWnd* pParent /*=nullptr*/)
 	, tb(1)
 	, bb(0)
 	, cdots(20)
+	, Utr(5)
+	, Ukr(0)
+	, IsCalcU(TRUE)
 {
 
 }
@@ -51,6 +54,9 @@ void StartSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER7, r2);
 	DDX_Control(pDX, IDC_SLIDER8, s2);
 	DDX_Text(pDX, IDC_EDIT4, cdots);
+	DDX_Text(pDX, IDC_EDIT9, Utr);
+	DDX_Text(pDX, IDC_EDIT10, Ukr);
+	DDX_Check(pDX, IDC_CHECK6, IsCalcU);
 }
 
 

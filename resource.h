@@ -30,6 +30,9 @@
 #define IDC_SLIDER6                     1019
 #define IDC_SLIDER7                     1020
 #define IDC_SLIDER8                     1021
+#define IDC_EDIT9                       1022
+#define IDC_EDIT10                      1023
+#define IDC_CHECK6                      1024
 #define ID_32771                        32771
 #define ID_START_SETTINGS               32772
 #define ID_RECURSIVE_TRIANGULATION      32773
@@ -40,7 +43,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32774
-#define _APS_NEXT_CONTROL_VALUE         1017
+#define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

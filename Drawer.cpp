@@ -34,10 +34,106 @@ END_MESSAGE_MAP()
 
 // Обработчики сообщений Drawer
 
-
-
-
 void Drawer::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	if (drawTriangulation)TriangulationMode(lpDrawItemStruct);
+	else UMode(lpDrawItemStruct);
+}
+
+
+void Drawer::UMode(LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	Graphics ToWindow(lpDrawItemStruct->hDC);
+	width = lpDrawItemStruct->rcItem.right - lpDrawItemStruct->rcItem.left;
+	height = lpDrawItemStruct->rcItem.bottom - lpDrawItemStruct->rcItem.top;
+	Bitmap bmp(width, height);
+	Graphics gr(&bmp);
+	gr.Clear(Color::White);
+
+	if (data.empty())
+	{
+		ToWindow.DrawImage(&bmp, 0, 0);
+		return;
+	}
+
+	gr.SetSmoothingMode(SmoothingModeAntiAlias);
+
+	double actWidth(right - left);
+	double actHeight(top - bot);
+	double actLP = actWidth * lPadding / 100.;
+	double actRP = actWidth * rPadding / 100.;
+	double actTP = actHeight * tPadding / 100.;
+	double actBP = actHeight * bPadding / 100.;
+
+	double actTop = top + actTP;
+	double actBot = bot - actBP;
+	double actLeft = left - actLP;
+	double actRight = right + actRP;
+
+	actWidth = actRight - actLeft;
+	actHeight = actTop - actBot;
+
+
+	double xScale = EternalScale * width / actWidth;
+	double yScale = EternalScale * -height / actHeight;
+
+	Matrix matr;
+	matr.Translate(dx, dy);
+	matr.Scale(xScale, yScale);
+	matr.Translate(actLP - left, -actTop);
+
+	Pen TrianglePen(Color::DimGray);
+	for (auto& tr : TrianglesData)
+	{
+		PointF p1 = tr.p1.AsPointF();
+		PointF p2 = tr.p2.AsPointF();
+		PointF p3 = tr.p3.AsPointF();
+
+		matr.TransformPoints(&p1);
+		matr.TransformPoints(&p2);
+		matr.TransformPoints(&p3);
+
+		gr.DrawLine(&TrianglePen, p1, p2);
+		gr.DrawLine(&TrianglePen, p1, p3);
+		gr.DrawLine(&TrianglePen, p3, p2);
+	}
+
+	Pen IsolanePen(Color::Orange);
+	for (auto& line : Isolines)
+	{
+		PointF p1 = line[0].AsPointF();
+		PointF p2 = line[1].AsPointF();
+
+		matr.TransformPoints(&p1);
+		matr.TransformPoints(&p2);
+
+		gr.DrawLine(&IsolanePen, p1, p2);
+	}
+
+	if (!Powerlines.empty())
+	{
+		Pen PowerlinePen(Color::HotPink,2);
+		
+		for (auto& line : Powerlines)
+		{
+			if (line.empty())continue;
+
+			PointF p1 = line[0].AsPointF();
+			matr.TransformPoints(&p1);
+			PointF p2;
+			for (int i = 1; i < line.size(); i++)
+			{
+				p2 = line[i].AsPointF();
+				matr.TransformPoints(&p2);
+				gr.DrawLine(&PowerlinePen, p1, p2);
+				p1 = p2;
+			}
+		}
+	}
+	ToWindow.DrawImage(&bmp, 0, 0);
+}
+
+void Drawer::TriangulationMode(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	Graphics ToWindow(lpDrawItemStruct->hDC);
 	width = lpDrawItemStruct->rcItem.right - lpDrawItemStruct->rcItem.left;
@@ -429,4 +525,19 @@ void Drawer::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	Invalidate();
 	CStatic::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void Drawer::SetTrianglesData(vector<rTriangle>&data)
+{
+	TrianglesData = data;
+}
+
+void Drawer::SetIsolines(vector<vector<mPoint>>& data)
+{
+	Isolines = data;
+}
+
+void Drawer::SetPowerlines(vector<vector<mPoint>>& data)
+{
+	Powerlines = data;
 }

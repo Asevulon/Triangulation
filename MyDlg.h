@@ -4,6 +4,7 @@
 
 #pragma once
 #include"Drawer.h"
+#include"galerkin.h"
 #include"StartSettingsDlg.h"
 // Диалоговое окно MyDlg
 class MyDlg : public CDialogEx
@@ -34,6 +35,7 @@ public:
 	Drawer m_mpic;
 	afx_msg void OnStartSettings();
 
+	Galerkin galerkin;
 	RecursiveTriangulation tr;
 	afx_msg void OnBnClickedOk();
 	CButton OkBtn;

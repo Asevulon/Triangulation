@@ -119,6 +119,9 @@ void MyDlg::OnStartSettings()
 	tr.SetBorders(dlg.lb, dlg.rb, dlg.tb, dlg.bb);
 	tr.SetTriangleDots(dlg.dots);
 	tr.SetTrianglesParams(mPoint(dlg.vtx1, dlg.vty1), mPoint(dlg.vtx2, dlg.vty2), dlg.vr1, dlg.vr2, dlg.vs1, dlg.vs2);
+	galerkin.SetBorderFi(dlg.Ukr);
+	galerkin.SetTriabgleFi(dlg.Utr);
+	galerkin.SetRange(dlg.lb, dlg.rb, dlg.bb, dlg.tb);
 	m_mpic.SetCircleDrawing(dlg.occ, dlg.icc);
 	m_mpic.Invalidate();
 }
@@ -182,7 +185,7 @@ DWORD __stdcall ThreadFunc(LPVOID p)
 {
 	MyDlg* dlg = (MyDlg*)p;
 
-
+	dlg->m_mpic.drawTriangulation = true;
 	dlg->tr.MakeStartGrid();
 	dlg->m_mpic.SetOCircleParams(dlg->tr.GetOCircleCenter(), dlg->tr.GetOCircleRadius());
 	dlg->m_mpic.SetICircleParams(dlg->tr.GetICircleCenter(), dlg->tr.GetICircleRadius());
@@ -194,14 +197,36 @@ DWORD __stdcall ThreadFunc(LPVOID p)
 		if (dlg->dlg.rgc)dlg->tr.RemoveOS();
 
 		CString str;
-		str.Format(L"Средняя близость к равностороннему треугольнику: %.2f", dlg->tr.Estimate());
+		str.Format(L"Средняя близость к равностороннему треугольнику: %.2f, расчет потенциала...", dlg->tr.Estimate());
 		dlg->EstCtrl.SetWindowTextW(str);
 	}
+	
+	
 
 	dlg->m_mpic.SetData(dlg->tr.GetPoints());
 	dlg->m_mpic.SetTriangles(dlg->tr.GetTriangles());
 	dlg->m_mpic.Invalidate();
 	dlg->KillTimer(dlg->timerid);
+
+	if (dlg->dlg.IsCalcU)
+	{
+		dlg->galerkin.SetNodes(dlg->tr.GetPoints());
+		dlg->galerkin.SetTriangles(dlg->tr.GetTriangles());
+		dlg->galerkin.test();
+
+		dlg->m_mpic.SetTrianglesData(dlg->galerkin.GetTriangles());
+		dlg->m_mpic.SetIsolines(dlg->galerkin.GetIsolines());
+		dlg->m_mpic.SetPowerlines(dlg->galerkin.GetPowerlines());
+		dlg->m_mpic.drawTriangulation = false;
+		dlg->m_mpic.Invalidate();
+	}
+
+	if (dlg->dlg.trc)
+	{
+		CString str;
+		str.Format(L"Средняя близость к равностороннему треугольнику: %.2f, потенциал расчитан.", dlg->tr.Estimate());
+		dlg->EstCtrl.SetWindowTextW(str);
+	}
 
 	return 0;
 }

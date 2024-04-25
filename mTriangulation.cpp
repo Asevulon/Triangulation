@@ -136,6 +136,11 @@ bool mPoint::operator==(mPoint& r)
 	return true;
 }
 
+Gdiplus::PointF mPoint::AsPointF()
+{
+	return Gdiplus::PointF(x,y);
+}
+
 
 rTriangle::rTriangle()
 {
@@ -144,6 +149,20 @@ rTriangle::rTriangle()
 rTriangle::rTriangle(mPoint& p1, mPoint& p2, mPoint& p3) :p1(p1), p2(p2), p3(p3)
 {
 	bOS = p1.IsOS || p2.IsOS || p3.IsOS;
+}
+
+mPoint& rTriangle::operator[](int id)
+{
+	// TODO: вставьте здесь оператор return
+	switch (id)
+	{
+	case 0: return p1;
+	case 1: return p2;
+	case 2: return p3;
+	default:
+		abort();
+		break;
+	}
 }
 
 void rTriangle::FillVector2d(Vector2d& v12, Vector2d& v23, Vector2d& v31)
@@ -184,6 +203,101 @@ bool rTriangle::Contains(mPoint& p)
 	if (p2 == p)return true;
 	if (p3 == p)return true;
 	return false;
+}
+
+int rTriangle::IContains(mPoint& p)
+{
+	if (p1 == p)return 0;
+	if (p2 == p)return 1;
+	if (p3 == p)return 2;
+	return -1;
+}
+
+double rTriangle::CalcS()
+{
+	Vector2d v12(p1, p2);
+	Vector2d v13(p1, p3);
+	Vector2d v23(p2, p3);
+	double a = v12.abs();
+	double b = v13.abs();
+	double c = v23.abs();
+	double p = (a + b + c) / 2.;
+	S = sqrt(p * (p - a) * (p - b) * (p - c));
+	return S;
+}
+
+void rTriangle::CalcABC(int id)
+{
+	double x1(p1.x), x2(p2.x), x3(p3.x);
+	double y1(p1.y), y2(p2.y), y3(p3.y);
+	double z1(0), z2(0), z3(0);
+	switch (id)
+	{
+	case 0:z1 = 1;
+		break;
+	case 1:z2 = 1;
+		break;
+	case 2:z3 = 1;
+		break;
+	default:
+		abort();
+		break;
+	}
+	A = (y2 - y1) * (z3 - z1) - (y3 - y1) * (z2 - z1);
+	B = (x2 - x1) * (z3 - z1) - (x3 - x1) * (z2 - z1);
+	C = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
+}
+
+void rTriangle::InitParamsForContainingCheck()
+{
+	v12 = Vector2d(p1, p2);
+	v23 = Vector2d(p2, p3);
+	v31 = Vector2d(p3, p1);
+
+	k1 = v12.GetK();
+	k2 = v23.GetK();
+	k3 = v31.GetK();
+
+	b1 = p1.y - k1 * p1.x;
+	b2 = p2.y - k2 * p2.x;
+	b3 = p3.y - k3 * p3.x;
+}
+
+bool rTriangle::NotContainsInInnerArea(mPoint& n)
+{
+	bool res1 = true;
+	bool res2 = true;
+	bool res3 = true;
+
+	if (v12.x > 0)
+	{
+		if ((k1 * n.x + b1) <= n.y)res1 = false;
+	}
+	else
+	{
+		if ((k1 * n.x + b1) >= n.y)res1 = false;
+	}
+
+	if (v23.x > 0)
+	{
+		if ((k2 * n.x + b2) <= n.y)res2 = false;
+	}
+	else
+	{
+		if ((k2 * n.x + b2) >= n.y)res2 = false;
+	}
+
+	if (v31.x > 0)
+	{
+		if ((k3 * n.x + b3) <= n.y)res3 = false;
+	}
+	else
+	{
+		if ((k3 * n.x + b3) >= n.y)res3 = false;
+	}
+
+	if (res1 && res2 && res3)return false;
+	return true;
 }
 
 bool RecursiveTriangulation::InitCircle()

@@ -59,4 +59,7 @@ public:
 	double vs1 = 27;
 	double vs2 = 27;
 	int cdots;
+	double Utr;
+	double Ukr;
+	BOOL IsCalcU;
 };

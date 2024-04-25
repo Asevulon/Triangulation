@@ -7,7 +7,7 @@
 using namespace std;
 
 #include"mTriangulation.h"
-
+#include"galerkin.h"
 class Drawer : public CStatic
 {
 	DECLARE_DYNAMIC(Drawer)
@@ -15,6 +15,9 @@ private:
 	vector<mPoint>data;
 	vector<rTriangle>triangles;
 
+	vector<rTriangle>TrianglesData;
+	vector<vector<mPoint>>Isolines;
+	vector<vector<mPoint>>Powerlines;
 	double lPadding;
 	double rPadding;
 	double tPadding;
@@ -65,6 +68,9 @@ public:
 protected:
 	double CalcStringLen(HDC hDC, CString string);
 	Color DetermineTriangleColor(double& tr);
+
+	void TriangulationMode(LPDRAWITEMSTRUCT);
+	void UMode(LPDRAWITEMSTRUCT);
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
@@ -87,6 +93,11 @@ public:
 	void NextTriangle();
 	void PrevTriangle();
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+
+	bool drawTriangulation = true;
+	void SetTrianglesData(vector<rTriangle>& data);
+	void SetIsolines(vector<vector<mPoint>>& data);
+	void SetPowerlines(vector<vector<mPoint>>&data);
 };
 
 
