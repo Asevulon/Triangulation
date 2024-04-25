@@ -369,7 +369,6 @@ void Galerkin::test()
 	SetBorderFi();
 	ProcessCN();
 	ProcessBJ();
-	PrintMartrix();
 	m_fi.resize(cn.size());
 	kazf(matr, bj, m_fi);
 	SetFiFromKazf();
