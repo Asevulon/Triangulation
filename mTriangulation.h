@@ -67,10 +67,14 @@ class RecursiveTriangulation
 
 	double OSval = 0.85;
 
+	mPoint circlesOS1;
+	mPoint circlesOS2;
+	double circlesOSRadius2 = 0;
 protected:
 	bool InitCircle();
 	bool InitRectGrid();
 	bool bCorrectRectGridNode(mPoint& n);
+	bool bCorrectRectGridNodeCircles(mPoint& n);
 	bool InitTriangle();
 	void CalcTrianglesNodes(rTriangle& target);
 	inline double noise();
@@ -84,6 +88,7 @@ protected:
 	inline void swap(vector<T>& target, int id1, int id2);
 
 	void TrianglesOS();
+	void CircleOS();
 
 	bool rMakeStartGrid();
 	bool GetRectGrid(vector<mPoint>&out);
@@ -124,4 +129,5 @@ public:
 	bool stop = false;
 	CRITICAL_SECTION cs;
 
+	bool InitCircles();
 };

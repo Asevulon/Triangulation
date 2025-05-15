@@ -468,13 +468,16 @@ void RecursiveTriangulation::TrianglesOS()
 	CalcTrianglesNodes(OsTriangle);
 }
 
+
+
 bool RecursiveTriangulation::rMakeStartGrid()
 {
 	nodes.clear();
 	triangles.clear();
 
 	if (!InitCircle())return false;
-	if (!InitTriangle())return false;
+	if (!InitCircles())return false; //Вместо InitTriangles
+	//if (!InitTriangle())return false;
 
 	mPoint os;
 	os.IsOS = true;
@@ -499,8 +502,8 @@ bool RecursiveTriangulation::rMakeStartGrid()
 	nodes.push_back(os);
 	LeaveCriticalSection(&cs);
 
-	TrianglesOS();
-
+	//TrianglesOS();
+	CircleOS();
 	OCircleCenter = CalcCircleCenter(nodes[0], nodes[1], nodes[2]);
 	OCircleRadius = CalcCircleRadius(OCircleCenter, nodes[0]);
 	ICircleCenter = CalcICircleCenter(nodes[0], nodes[1], nodes[2]);
@@ -542,7 +545,7 @@ bool RecursiveTriangulation::GetRectGrid(vector<mPoint>& out)
 			double x = j * step + noise();
 			double y = i * step + noise();
 			mPoint n(x, y, gridp);
-			if (bCorrectRectGridNode(n))
+			if (bCorrectRectGridNodeCircles(n))
 			{
 				res.push_back(n);
 			}
@@ -741,7 +744,7 @@ bool RecursiveTriangulation::InitRectGrid()
 			double x = j * step + noise();
 			double y = i * step + noise();
 			mPoint n(x, y, gridp);
-			if (bCorrectRectGridNode(n))
+			if (bCorrectRectGridNodeCircles(n))
 			{
 				EnterCriticalSection(&cs);
 				nodes.push_back(n);
@@ -843,6 +846,14 @@ bool RecursiveTriangulation::bCorrectRectGridNode(mPoint& n)
 
 	if (res1 && res2 && res3)return false;
 
+	return true;
+}
+
+bool RecursiveTriangulation::bCorrectRectGridNodeCircles(mPoint& n)
+{
+	if ((pow2(n.x - m_CircleRadius) + pow2(n.y - m_CircleRadius)) >= m_CircleRadius2)return false;
+	if ((pow2(n.x - circlesOS1.x) + pow2(n.y - circlesOS1.y)) <= circlesOSRadius2)return false;
+	if ((pow2(n.x - circlesOS2.x) + pow2(n.y - circlesOS2.y)) <= circlesOSRadius2)return false;
 	return true;
 }
 
@@ -1026,6 +1037,8 @@ bool RecursiveTriangulation::rTriangulate()
 	return true;
 }
 
+
+
 void RecursiveTriangulation::SetTrianglesParams(mPoint tr1, mPoint tr2, double r1, double r2, double s1, double s2)
 {
 	Triangle1Translatiaon = tr1;
@@ -1050,7 +1063,8 @@ bool RecursiveTriangulation::MakeStartGrid()
 	srand(time(NULL));
 
 	if (!InitCircle())return false;
-	if (!InitTriangle())return false;
+	if (!InitCircles())return false;//Вместо InitTriangle
+	//if (!InitTriangle())return false;
 	if (!InitRectGrid())return false;
 
 	mPoint os;
@@ -1076,7 +1090,8 @@ bool RecursiveTriangulation::MakeStartGrid()
 	nodes.push_back(os);
 	LeaveCriticalSection(&cs);
 
-	TrianglesOS();
+	//TrianglesOS();
+	CircleOS();
 
 	OCircleCenter = CalcCircleCenter(nodes[0], nodes[1], nodes[2]);
 	OCircleRadius = CalcCircleRadius(OCircleCenter, nodes[0]);
@@ -1090,6 +1105,104 @@ void RecursiveTriangulation::SetCircleDots(int cdots)
 {
 	CircleDots = cdots;
 	CircleDotsInit = true;
+}
+
+void RecursiveTriangulation::CircleOS()
+{
+	EnterCriticalSection(&cs);
+	nodes.push_back(circlesOS1);
+	nodes.push_back(circlesOS2);
+	LeaveCriticalSection(&cs);
+}
+
+bool RecursiveTriangulation::InitCircles()
+{
+	if (!TriangleInit)
+	{
+		throw("Triangles params not init");
+		return false;
+	}
+	if (!BordersInit)
+	{
+		throw("Borders not init");
+		return false;
+	}
+	if (!TriangleDotsInit)
+	{
+		throw("TriangleDots not init");
+		return false;
+	}
+
+	double CircleR = (rb - lb) / 2.;
+	PointF p1(0, 0);
+	PointF p2(CircleR, 0);
+	Matrix m;
+	m.Translate(Triangle1Translatiaon.x * rb / 100., Triangle1Translatiaon.y * rb / 100.);
+	m.Rotate(Triangle1Rotation);
+	m.Scale(Triangle1Scale, Triangle1Scale);
+	m.TransformPoints(&p1);
+	m.TransformPoints(&p2);
+
+	double x0 = p1.X + noise();
+	double y0 = p1.Y + noise();
+
+	circlesOS1.x = x0;
+	circlesOS1.y = y0;
+	circlesOS1.IsOS = true;
+	circlesOS1.InBaseTriangle = true;
+
+	const double Pi2 = atan(1) * 8;
+	double step = Pi2 / (TriangleDots - 1);
+	double radius = sqrt((p2.X - p1.X) * (p2.X - p1.X) + (p2.Y - p1.Y) * (p2.Y - p1.Y));
+	for (int i = 0; i < TriangleDots; ++i)
+	{
+		mPoint p;
+		p.x = x0 + radius * cos(step * i) + noise();
+		p.y = y0 + radius * sin(step * i) + noise();
+		p.type = trianglep;
+
+		EnterCriticalSection(&cs);
+		nodes.push_back(p);
+		LeaveCriticalSection(&cs);
+	}
+	
+	p1 = PointF(0, 0);
+	p2 = PointF(CircleR, 0);
+
+	m.Reset();
+
+	m.Translate(Triangle2Translatiaon.x * rb / 100., Triangle2Translatiaon.y * rb / 100.);
+	m.Rotate(Triangle2Rotation);
+	m.Scale(Triangle2Scale, Triangle2Scale);
+
+	m.TransformPoints(&p1);
+	m.TransformPoints(&p2);
+
+	x0 = p1.X + noise();
+	y0 = p1.Y + noise();
+
+	circlesOS2.x = x0;
+	circlesOS2.y = y0;
+	circlesOS2.IsOS = true;
+	circlesOS2.InBaseTriangle = true;
+
+	TriangleNodesInit = true;
+	radius = sqrt((p2.X - p1.X) * (p2.X - p1.X) + (p2.Y - p1.Y) * (p2.Y - p1.Y));
+	for (int i = 0; i < TriangleDots; ++i)
+	{
+		mPoint p;
+		p.x = x0 + radius * cos(step * i) + noise();
+		p.y = y0 + radius * sin(step * i) + noise();
+		p.type = trianglep;
+
+		EnterCriticalSection(&cs);
+		nodes.push_back(p);
+		LeaveCriticalSection(&cs);
+	}
+
+	circlesOSRadius2 = pow2(radius);
+	
+	return true;
 }
 
 bool RecursiveTriangulation::InitTriangle()

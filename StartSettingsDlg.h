@@ -50,10 +50,10 @@ public:
 	CSliderCtrl r2;
 	CSliderCtrl s2;
 
-	double vtx1 = 21;
-	double vty1 = 21;
-	double vtx2 = 50;
-	double vty2 = 50;
+	double vtx1 = 30;
+	double vty1 = 30;
+	double vtx2 = 60;
+	double vty2 = 60;
 	double vr1 = 0;
 	double vr2 = 0;
 	double vs1 = 27;
